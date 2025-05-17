@@ -1,42 +1,46 @@
 # Music Fingerprint
 
-This audio fingerprinter combined the original version of Acoustic Chromaprint and 
-Libfooid into a single, more accurate fingerprinting system for identifying music files.
+This audio fingerprinter combined the original version of [AcoustID Chromaprint](https://acoustid.org/chromaprint) and [Libfooid](https://github.com/timmartin/libfooid) into a single, more accurate fingerprinting system for identifying music files.
 
-It includes a Postgres GiST index for comparing music fingerprints. 
-(This how we built vector dbs back in 2010.)
+It includes a Postgres GiST index for comparing music fingerprints. (This how we built vector databases back in 2010.)
 
 ## Installation
 
 * install the dependencies (there are lots!)
+  ```sh
   cd requirements
   ./ubuntu-install
+  ```
 
 * run the makefile:
 
+  ```sh
   make
   sudo make install
+  ```
 
-libs install to /usr/local/lib/
+`libs` install to `/usr/local/lib/`
 
 * make the python binding
 
+  ```sh
   make python
+  ```
 
 * copy the resulting musicfp.so into your python site-packages
   or, for a standard Ubuntu install into dist-packages, typically:
 
   * on OS X 10.6 (Snow Leopard):
     
-    /Library/Python/2.6/site-packages/
+    `/Library/Python/2.6/site-packages/`
 
   * on OS X 10.5 (Leopard, python package install):
 
-    /Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/
+    `/Library/Frameworks/Python.framework/Versions/2.6/lib/python2.6/site-packages/`
 
   * on Ubuntu (tested on 10.04, Lucid)
 
-    /usr/lib/python2.6/dist-packages/
+    `/usr/lib/python2.6/dist-packages/`
 
 * For the postgres GiST index, you need to install postgresql 
   (server and client), then make the bindings
@@ -46,14 +50,17 @@ libs install to /usr/local/lib/
     Ubuntu:
     -------
 
+    ```sh
     sudo apt-get -y install postgresql postgresql-common postgresql-client-common libpq-dev postgresql-server-dev-8.4
     sudo apt-get -y install python-psycopg2
+    ```
 
     OS X (MacPorts):
     ---------------
 
     * install MacPorts postgresql84-server or postgresql90-server
 
+    ```sh
     sudo port install postgresql84-server
     sudo mkdir -p /opt/local/var/db/postgresql84/defaultdb
     sudo chown postgres:postgres /opt/local/var/db/postgresql84/defaultdb
@@ -64,14 +71,19 @@ libs install to /usr/local/lib/
     # at this point postgres will start up and you can do with it as you will
     # but you want the Python bindings as well.  For both you will need 
     # ARCHFLAGS to build psycopg2.
+    ```
 
     - on OS X 10.6
 
+    ```sh
     ARCHFLAGS="-arch x86_64" CFLAGS="-I/opt/local/lib/postgresql84" LDFLAGS="-L/opt/local/lib/postgresql84" easy_install psycopg2
+    ```
 
     - on OS X 10.5
 
+    ```sh
     ARCHFLAGS="-arch i386" CFLAGS="-I/opt/local/lib/postgresql84" LDFLAGS="-L/opt/local/lib/postgresql84" easy_install psycopg2
+    ```
 
     WARNING: This has been tested with the apt i386 version and MacPorts versions
              but you may want finer-grained control and for development purposes
@@ -79,7 +91,7 @@ libs install to /usr/local/lib/
              and --enable-cassert. Follow the directions for installing from
              source, below.
 
-  * edit /etc/postgresql/8.4/main/pg_hba.conf :
+  * edit `/etc/postgresql/8.4/main/pg_hba.conf` :
 
     - comment out the line:
     #local  postgres    postgres                         ident
@@ -99,11 +111,13 @@ libs install to /usr/local/lib/
 
     * cd into $TOPDIR/postgres and execute:
     
+      ```sh
       make
       sudo make install
       sudo service postgresql-8.4 restart
       # (depending on the database you have, here we are using "postgres")
       psql -U postgres -f pgfprint.sql postgres
+      ```
 
 ## building Postgresql from Source on Ubuntu 10.04
 
