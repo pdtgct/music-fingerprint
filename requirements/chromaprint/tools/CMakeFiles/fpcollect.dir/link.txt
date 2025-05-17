@@ -1,0 +1,1 @@
+/usr/bin/c++    -Wl,-search_paths_first -headerpad_max_install_names  CMakeFiles/fpcollect.dir/fpcollect.cpp.o  -o fpcollect  ../src/libchromaprint.dylib ../src/libchromaprintext.a -L/usr/local/lib -ltag /opt/local/lib/libavformat.dylib /opt/local/lib/libavcodec.dylib /opt/local/lib/libavutil.dylib 

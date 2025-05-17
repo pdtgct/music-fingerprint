@@ -1,0 +1,19 @@
+import os
+import sys
+
+libs = ['resample']
+if sys.platform == 'darwin':
+    libs.append('System')
+
+StaticLibrary(
+    'fooid', 
+    Glob('*.c'),
+    LIBS=libs,
+    LIBPATH='libresample',
+    CPPPATH=['/usr/include', '.'])
+SharedLibrary(
+    'fooid',
+    Glob('*.c'),
+    LIBS=libs,
+    LIBPATH='libresample',
+    CPPPATH=['/usr/include', '.'])

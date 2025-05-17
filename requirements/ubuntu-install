@@ -1,0 +1,134 @@
+#!/bin/bash
+
+# NOTEs:
+# * to run under python you need to add /usr/local/lib to your 
+#   LD_LIBRARY_PATH:
+#
+#     export LD_LIBRARY_PATH=/usr/lib:/usr/local/lib
+#
+# * do not build chromaprint using FFTW3 -- chromaprint will bonk out
+#   for overly large packets
+#
+
+# see http://ubuntuforums.org/showpost.php?p=9868359&postcount=1289
+
+# goes for all shared and static types (support shared ffmpeg)
+export CFLAGS="-fPIC"
+
+sudo apt-get -y remove ffmpeg x264 libx264-dev
+
+sudo apt-get -y install build-essential subversion git-core checkinstall yasm texi2html \
+    libfaac-dev libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev \
+    libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev zlib1g-dev \
+    cmake scons python-numpy libboost-all-dev libgtest-dev libpostproc-dev libswscale-dev \
+    libtag1-dev bzr 
+
+git clone git://git.videolan.org/x264.git
+
+cd x264
+./configure --enable-shared
+make
+sudo checkinstall --pkgname=x264 --pkgversion "2:0.`grep X264_BUILD x264.h -m1 | \
+    cut -d' ' -f3`.`git rev-list HEAD | wc -l`+git`git rev-list HEAD -n 1 | \
+    head -c 7`" --backup=no --default --deldoc=yes
+cd ..
+
+sudo apt-get remove libmp3lame-dev
+sudo apt-get install nasm
+wget http://downloads.sourceforge.net/project/lame/lame/3.98.4/lame-3.98.4.tar.gz
+tar xzvf lame-3.98.4.tar.gz
+cd lame-3.98.4
+./configure --enable-nasm --enable-shared
+make
+sudo checkinstall --pkgname=lame-ffmpeg --pkgversion="3.98.4" --backup=no --default \
+    --deldoc=yes
+cd ..
+
+git clone git://review.webmproject.org/libvpx.git
+cd libvpx
+./configure
+make
+sudo checkinstall --pkgname=libvpx --pkgversion="`date +%Y%m%d%H%M`-git" --backup=no \
+    --default --deldoc=yes
+cd ..
+
+# NB:
+# do not enable libfaad; the binary does not get initialized properly in a 
+# dynamic library context, even if you set LD_LIBRARY_PATH or (more uniform)
+# set a path to /usr/local/lib (default when using libc) in 
+# /etc/ld.so.conf.d/
+
+svn checkout svn://svn.ffmpeg.org/ffmpeg/trunk ffmpeg
+wget http://ffmpeg.org/releases/ffmpeg-0.6.tar.gz
+tar -zxf ffmpeg-0.6.tar.gz
+cd ffmpeg-0.6
+export CPPFLAGS="-D__STDC_CONSTANT_MACROS"
+./configure --enable-gpl --enable-version3 --enable-nonfree --enable-postproc \
+    --enable-libopencore-amrnb --enable-libopencore-amrwb \
+    --enable-libtheora --enable-libvorbis --enable-libx264 --enable-libxvid \
+    --enable-x11grab --enable-libmp3lame --enable-shared
+make
+sudo checkinstall --pkgname=ffmpeg --pkgversion "0.6" --backup=no --default --deldoc=yes
+hash x264 ffmpeg ffplay
+cd ..
+
+# dep for chromaprint (for testing)
+#wget http://download.savannah.gnu.org/releases/pngpp/png++-0.2.3.tar.gz
+#tar zxf png++-0.2.3.tar.gz
+#cd png++-0.2.3
+#make
+#sudo checkinstall --pkgname=pngpp --pkgversion="0.2.3" --backup=no \
+#    --default --deldoc=yes
+#cd ..
+
+# dep for chromaprint (for testing)
+#wget http://googletest.googlecode.com/files/gtest-1.5.0.tar.bz2
+#tar jxf gtest-1.5.0.tar.bz2
+#cd gtest-1.5.0
+#./configure
+#make
+#sudo checkinstall --pkgname=gtest --pkgversion="1.5.0" --backup=no \
+#    --default --deldoc=yes
+#cd ..
+
+# chromaprint
+#bzr branch lp:chromaprint
+cd chromaprint
+cmake -DFFMPEG_ROOT=/usr/local -DMAKE_BUILD_TYPE=Release .
+make
+cat <<EOF > install.sh
+#!/bin/bash
+
+cp src/libchromaprint.so /usr/local/lib/ 
+chown root:root /usr/local/lib/libchromaprint.so
+mkdir -p /usr/local/include/chromaprint/ext
+cp src/*.h /usr/local/include/chromaprint/
+cp src/ext/*.h /usr/local/include/chromaprint/ext/
+chown -R root:root /usr/local/include/chromaprint
+EOF
+chmod +x install.sh
+./install.sh
+cd ..
+
+# libfooid
+# TODO: port to Makefiles
+cd libfooid-1.0/libresample
+scons
+sudo cp libresample.so /usr/local/lib/
+sudo chown root:root /usr/local/lib/libfooid.so
+cd ..
+scons
+sudo mkdir -p /usr/local/include/libfooid
+sudo cp *.h /usr/local/include/libfooid/
+sudo cp libfooid.so /usr/local/lib/
+sudo chown root:root /usr/local/lib/libfooid.so
+cd ..
+
+sudo easy_install cython
+
+# to remove the changes made here
+#sudo apt-get remove x264 ffmpeg qt-faststart build-essential subversion git-core \
+#    checkinstall nasm yasm texi2html libfaac-dev lame-ffmpeg libsdl1.2-dev libtheora-dev \
+#    libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev zlib1g-dev pngpp gtest \
+#    cmake scons python-numpy libboost-all-dev libgtest-dev libpostproc-dev libswscale-dev \
+#    libtag1-dev bzr

@@ -1,0 +1,11 @@
+From Chromaprint:
+=================
+Coolio - SUNDAY MORNING                                      Long Beach Dub Allstars - Sunny Hours                        0.995396
+Jack Johnson - Rodeo Clowns                                  Jack Johnson - Rodeo Clowns                                  0.889455
+The Pursuit of Happiness - I'm an Adult Now                  The Pursuit of Happiness - I'm an Adult Now                  0.875058
+Eminem - My Name Is (clean version)                          Eminem - My Name Is                                          0.630896
+Eminem - My Name Is                                          Eminem - My Name Is [Clean]                                  0.630896
+-- the two Eminem clean versions match == 1.0; there is only one Eminem dirty
+
+
+

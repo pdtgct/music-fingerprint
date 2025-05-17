@@ -1,0 +1,7 @@
+To output raw format for mp3:
+
+lame --decode -t blue.mp3 blue.raw
+
+-t does not output .wav headers so all data is raw,
+endian native (x86: little endian)
+

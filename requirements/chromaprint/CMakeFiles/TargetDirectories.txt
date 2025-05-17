@@ -1,0 +1,6 @@
+/Users/petet/Programming/test/chromaprint/tests/CMakeFiles/all_tests.dir
+/Users/petet/Programming/test/chromaprint/tests/CMakeFiles/check.dir
+/Users/petet/Programming/test/chromaprint/src/CMakeFiles/chromaprint.dir
+/Users/petet/Programming/test/chromaprint/src/CMakeFiles/chromaprintext.dir
+/Users/petet/Programming/test/chromaprint/tools/CMakeFiles/fpcollect.dir
+/Users/petet/Programming/test/chromaprint/tools/CMakeFiles/fpgen.dir

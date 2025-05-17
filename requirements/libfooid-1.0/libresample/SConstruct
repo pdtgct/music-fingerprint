@@ -1,0 +1,3 @@
+
+StaticLibrary('resample', Glob('*.c'))
+SharedLibrary('resample', Glob('*.c'))
